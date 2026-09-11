@@ -1,7 +1,7 @@
 # 🚀 Autonomous Job Application & ATS Resume Tailoring Agent
 
-An open-source, local-first, **100% zero-cost** autonomous agent that automates the job search and application workflow:
-1. **Discovers** jobs on portals (like Naukri.com) using Playwright.
+An open-source, local-first, **100% zero-cost** autonomous agent that automates the job search and application workflow across **Naukri.com** and **LinkedIn (Easy Apply)**:
+1. **Discovers** jobs on portals using Playwright stealth automation.
 2. **Filters** positions strictly based on your runtime constraints (Tech Stack & Years of Experience).
 3. **Tailors** your authentic LaTeX / HTML resume using **Google Gemini 3.6 Flash** (Free Tier) to optimize ATS keyword matching with zero hallucinations.
 4. **Compiles** pixel-perfect, guaranteed single-page PDFs locally.
@@ -91,3 +91,4 @@ node run_agent.js --keywords "Backend Developer" --tech "Spring Boot, Docker, AW
 
 ## 📜 License
 MIT License
+

@@ -11,7 +11,9 @@ const db = require('./core/database');
 const geminiTailor = require('./core/gemini_tailor');
 const pdfCompiler = require('./core/pdf_compiler');
 const NaukriScraper = require('./scrapers/naukri_scraper');
+const LinkedinScraper = require('./scrapers/linkedin_scraper');
 const AutoApply = require('./core/auto_apply');
+const LinkedinAutoApply = require('./core/linkedin_auto_apply');
 
 // Load default settings
 const settingsPath = path.join(__dirname, 'config', 'settings.json');
@@ -24,6 +26,7 @@ program
   .name('naukri-agent')
   .description('Autonomous Zero-Cost Job Application & Resume Tailoring Agent')
   .version('1.0.0')
+  .option('-p, --platform <platform>', 'Job platform: naukri or linkedin', 'naukri')
   .option('-r, --resume <path>', 'Path to your standard resume file (.pdf, .html, .tex)')
   .option('-k, --keywords <string>', 'Job search keywords', settings.job_filters?.keywords || 'Backend Developer')
   .option('-t, --tech <string>', 'Target tech stack constraints (comma-separated)', (settings.user_profile?.core_skills || ['Java', 'Spring Boot']).join(', '))
@@ -97,7 +100,10 @@ async function main() {
 
   const techStackList = options.tech.split(',').map(s => s.trim());
 
+  const isLinkedIn = (options.platform || 'naukri').toLowerCase() === 'linkedin';
+
   console.log('\n--- Active Runtime Constraints ---');
+  console.log(`• Target Platform:  ${isLinkedIn ? 'LINKEDIN (Easy Apply)' : 'NAUKRI.COM'}`);
   console.log(`• Keywords:         ${options.keywords}`);
   console.log(`• Target Tech:      ${techStackList.join(', ')}`);
   console.log(`• Experience Req:   ${options.yoe} Years`);
@@ -113,8 +119,11 @@ async function main() {
     headless: !options.headed,
     slowMo: Number(options.slow) || (options.headed ? 600 : 0)
   };
-  const scraper = new NaukriScraper(browserConfig);
-  console.log('[Agent] Stage 1: Initiating stealth job discovery on Naukri...');
+  const scraper = isLinkedIn
+    ? new LinkedinScraper(browserConfig)
+    : new NaukriScraper(browserConfig);
+
+  console.log(`[Agent] Stage 1: Initiating stealth job discovery on ${isLinkedIn ? 'LinkedIn' : 'Naukri'}...`);
 
   const matchingJobs = await scraper.searchJobs({
     keywords: options.keywords,
@@ -160,7 +169,9 @@ async function main() {
     if (options.mode === 'auto-apply') {
       console.log(`[Agent] Stage 4: Submitting application on portal...`);
       const { browser, context, isCdp } = await scraper.getBrowserContext();
-      const autoApplier = new AutoApply(context, settings);
+      const autoApplier = isLinkedIn
+        ? new LinkedinAutoApply(context, settings)
+        : new AutoApply(context, settings);
       const result = await autoApplier.apply(job, pdfPath);
 
       if (result.success) {

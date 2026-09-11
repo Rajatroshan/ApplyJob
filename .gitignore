@@ -17,3 +17,4 @@ data/jobs.json.tmp
 
 # Generated PDFs (optional, un-comment to exclude local generated resumes)
 # output/pdf/*.pdf
+
