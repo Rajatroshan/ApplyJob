@@ -10,3 +10,4 @@ echo 3. Your session is saved PERMANENTLY for the agent!
 echo ======================================================
 start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --user-data-dir="C:\ChromeProfile" "https://www.linkedin.com/login"
 pause
+

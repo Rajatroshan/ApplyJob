@@ -27,10 +27,15 @@ program
   .description('Autonomous Zero-Cost Job Application & Resume Tailoring Agent')
   .version('1.0.0')
   .option('-p, --platform <platform>', 'Job platform: naukri or linkedin', 'naukri')
+  .option('-i, --interactive', 'Interactively ask role, yoe, location, and CTC at start', false)
   .option('-r, --resume <path>', 'Path to your standard resume file (.pdf, .html, .tex)')
-  .option('-k, --keywords <string>', 'Job search keywords', settings.job_filters?.keywords || 'Backend Developer')
+  .option('-k, --keywords <string>', 'Job search keywords', settings.job_filters?.keywords || 'Java Developer')
+  .option('-c, --location <city>', 'Location preference', 'Hyderabad')
   .option('-t, --tech <string>', 'Target tech stack constraints (comma-separated)', (settings.user_profile?.core_skills || ['Java', 'Spring Boot']).join(', '))
-  .option('-y, --yoe <number>', 'Years of Experience (YoE)', settings.job_filters?.experience_min || 3)
+  .option('-y, --yoe <number>', 'Years of Experience (YoE)', 1)
+  .option('--current-ctc <number>', 'Current CTC in INR', settings.screening_answers?.current_ctc_raw || 450000)
+  .option('--expected-ctc <number>', 'Expected CTC in INR', settings.screening_answers?.expected_ctc_raw || 900000)
+  .option('--notice <days>', 'Notice period in days', settings.screening_answers?.notice_period_days || 60)
   .option('-l, --limit <number>', 'Maximum matching jobs to process', 3)
   .option('-m, --mode <mode>', 'Execution mode: dry-run (generate PDFs only) or auto-apply (submit live)', 'dry-run')
   .option('--headed', 'Launch a visible browser window on your desktop screen to watch it live', false)
@@ -76,6 +81,38 @@ async function main() {
   console.log('🚀 AUTONOMOUS JOB APPLICATION & RESUME TAILORING AGENT');
   console.log('======================================================\n');
 
+  if (options.interactive) {
+    console.log('📋 Runtime Search & Application Constraints (Press [Enter] to keep default):');
+    const roleAns = await askQuestion(`1. Target Job Role [${options.keywords}]: `);
+    if (roleAns) options.keywords = roleAns;
+
+    const yoeAns = await askQuestion(`2. Experience in Years [${options.yoe}]: `);
+    if (yoeAns) options.yoe = Number(yoeAns);
+
+    const locAns = await askQuestion(`3. Preferred Location [${options.location}]: `);
+    if (locAns) options.location = locAns;
+
+    const curCtc = await askQuestion(`4. Current CTC [₹${options.currentCtc}]: `);
+    if (curCtc) options.currentCtc = Number(curCtc.replace(/[^0-9]/g, ''));
+
+    const expCtc = await askQuestion(`5. Expected CTC [₹${options.expectedCtc}]: `);
+    if (expCtc) options.expectedCtc = Number(expCtc.replace(/[^0-9]/g, ''));
+
+    const noticeAns = await askQuestion(`6. Notice Period in Days [${options.notice}]: `);
+    if (noticeAns) options.notice = Number(noticeAns);
+    console.log('');
+  }
+
+  // Update screening answers with active runtime values
+  settings.screening_answers = {
+    ...settings.screening_answers,
+    current_ctc_raw: Number(options.currentCtc),
+    current_ctc_lpa: Number(options.currentCtc) / 100000,
+    expected_ctc_raw: Number(options.expectedCtc),
+    expected_ctc_lpa: Number(options.expectedCtc) / 100000,
+    notice_period_days: Number(options.notice)
+  };
+
   let resumePath = options.resume;
   if (!resumePath) {
     const defaultTemplate = path.join(__dirname, 'templates', 'base_resume.html');
@@ -104,9 +141,13 @@ async function main() {
 
   console.log('\n--- Active Runtime Constraints ---');
   console.log(`• Target Platform:  ${isLinkedIn ? 'LINKEDIN (Easy Apply)' : 'NAUKRI.COM'}`);
-  console.log(`• Keywords:         ${options.keywords}`);
-  console.log(`• Target Tech:      ${techStackList.join(', ')}`);
+  console.log(`• Job Role:         ${options.keywords}`);
+  console.log(`• Location:         ${options.location}`);
   console.log(`• Experience Req:   ${options.yoe} Years`);
+  console.log(`• Target Tech:      ${techStackList.join(', ')}`);
+  console.log(`• Current CTC:      ₹${options.currentCtc.toLocaleString ? options.currentCtc.toLocaleString('en-IN') : options.currentCtc}`);
+  console.log(`• Expected CTC:     ₹${options.expectedCtc.toLocaleString ? options.expectedCtc.toLocaleString('en-IN') : options.expectedCtc}`);
+  console.log(`• Notice Period:    ${options.notice} Days`);
   console.log(`• Max Jobs:         ${options.limit}`);
   console.log(`• Execution Mode:   ${options.mode.toUpperCase()}`);
   console.log(`• Browser Mode:     ${options.headed ? 'VISIBLE (Desktop Window)' : 'HEADLESS (Background)'}`);
@@ -127,7 +168,8 @@ async function main() {
 
   const matchingJobs = await scraper.searchJobs({
     keywords: options.keywords,
-    yoe_min: options.yoe,
+    location: options.location,
+    yoe: options.yoe,
     tech_stack: techStackList,
     limit: Number(options.limit)
   });

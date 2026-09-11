@@ -48,9 +48,11 @@
     "exclude_service_companies": false
   },
   "screening_answers": {
-    "notice_period_days": 30,
-    "current_ctc_lpa": 6,
-    "expected_ctc_lpa": 12,
+    "notice_period_days": 60,
+    "current_ctc_lpa": 4.5,
+    "current_ctc_raw": 450000,
+    "expected_ctc_lpa": 9.0,
+    "expected_ctc_raw": 900000,
     "ready_to_relocate": "Yes",
     "work_authorization": "Yes"
   },

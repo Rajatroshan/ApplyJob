@@ -190,3 +190,4 @@ class LinkedinScraper {
 }
 
 module.exports = LinkedinScraper;
+

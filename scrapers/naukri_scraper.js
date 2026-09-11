@@ -57,12 +57,16 @@ class NaukriScraper {
    * @returns {Promise<Array>} - List of matching job objects
    */
   async searchJobs(options = {}) {
-    const keywords = (options.keywords || 'Backend Developer').replace(/\s+/g, '-').toLowerCase();
-    const yoe = options.yoe_min || 3;
+    const keywords = (options.keywords || 'Java Developer').replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').toLowerCase();
+    const location = (options.location || '').replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').toLowerCase();
+    const yoe = options.yoe !== undefined ? options.yoe : (options.yoe_min !== undefined ? options.yoe_min : 1);
     const targetTech = (options.tech_stack || ['Java', 'Spring Boot']).map(t => t.toLowerCase().trim());
     const limit = options.limit || 5;
 
-    const searchUrl = `https://www.naukri.com/${keywords}-jobs?experience=${yoe}`;
+    let searchUrl = `https://www.naukri.com/${keywords}-jobs?experience=${yoe}`;
+    if (location && location !== 'all' && location !== 'india') {
+      searchUrl = `https://www.naukri.com/${keywords}-jobs-in-${location}?experience=${yoe}`;
+    }
     console.log(`[Scraper] Navigating to: ${searchUrl}`);
 
     const { browser, context, isCdp } = await this.getBrowserContext();

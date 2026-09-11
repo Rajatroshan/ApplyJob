@@ -119,3 +119,4 @@ class LinkedinAutoApply {
 }
 
 module.exports = LinkedinAutoApply;
+

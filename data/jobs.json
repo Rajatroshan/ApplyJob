@@ -101,6 +101,44 @@
       "updated_at": "2026-09-11T10:21:25.084Z",
       "created_at": "2026-09-11T10:21:07.663Z",
       "tailored_resume_path": "c:\\naukri\\output\\pdf\\Damacloid_Technologies_Backend_Developer.pdf"
+    },
+    "li_Java_Developer_Java_Developer_with_verification_HCLTech_2": {
+      "job_id": "li_Java_Developer_Java_Developer_with_verification_HCLTech_2",
+      "title": "Java Developer\nJava Developer with verification",
+      "company": "HCLTech",
+      "location": "Vadodara, Gujarat, India (On-site)",
+      "experience_req": "2+ Years",
+      "skills": [
+        "spring boot",
+        "docker",
+        "aws"
+      ],
+      "jd_text": "About the job\n\nKey Responsibilities\n\n1. Lead a team of java/j2ee developers in the design, development, and implementation of restful web services using spring boot.\n\n2. Define and implement best practices for coding, testing, and deployment to ensure high performance, scalability, and security of applications.\n\n3. Collaborate with cross functional teams to gather requirements, provide technical guidance, and drive architectural decisions.\n\n4. Conduct code reviews, troubleshoot technical issues, and mentor junior team members to foster a culture of continuous learning and improvement.\n\n5. Stay updated on emerging technologies, industry trends, and best practices to recommend innovative solutions and drive technical innovation within the team.\n\n\n\n\nSkill Requirements\n\n1. Strong expertise in java/j2ee technologies, restful web services, and spring boot framework.\n\n2. Proven experience in designing and implementing scalable and secure web applications using java.\n\n3. In-depth knowledge of microservices architecture, cloud technologies, and containerization (e.g., docker, kubernetes).\n\n4. Familiarity with devops practices, ci/cd pipelines, and agile development methodologies.\n\n5. Excellent problem-solving skills, attention to detail, and ability to work effectively in a fast paced environment.\n\n6. Strong communication skills to collaborate with stakeholders, present technical concepts, and lead technical discussions effectively.",
+      "apply_url": "https://www.linkedin.com/jobs/search/?currentJobId=4462254935&f_AL=true&keywords=Backend%20Developer&origin=JOB_SEARCH_PAGE_JOB_FILTER",
+      "source": "linkedin",
+      "status": "TAILORED",
+      "updated_at": "2026-09-11T13:46:21.051Z",
+      "created_at": "2026-09-11T13:45:41.270Z",
+      "tailored_resume_path": "c:\\naukri\\output\\pdf\\HCLTech_Java_Developer_Java_Developer_with_verification.pdf"
+    },
+    "li_Back_End_Developer_Back_End_Developer_with_verification_IntraEdge_4": {
+      "job_id": "li_Back_End_Developer_Back_End_Developer_with_verification_IntraEdge_4",
+      "title": "Back End Developer\nBack End Developer with verification",
+      "company": "IntraEdge",
+      "location": "Pune District, Maharashtra, India (Hybrid)",
+      "experience_req": "2+ Years",
+      "skills": [
+        "spring boot",
+        "docker",
+        "aws"
+      ],
+      "jd_text": "About the job\n\nJob Title: Senior Java Developer\n\nExperience Level: Senior (7+ years)\n\nLocation: Pune\n\nEmployment Type: Full-time\n\n\n\n\nRole Overview\n\nWe are looking for a strong Java engineer with hands-on experience in Functional Programming, Microservices architecture, and Cloud deployment patterns. This role requires a deep understanding of Java's modern capabilities (including Java 21 features), event-driven architectures (Kafka), and cloud-native development (preferably GCP).\n\nYou will be part of a high-performing team delivering scalable backend solutions for CLIENT, a global financial services leader that is undergoing a major modernization effort in its Collateral and Risk Management space.\n\nKey Responsibilities\n\nDesign and implement microservices using modern Java functional programming concepts.\nCollaborate on event-driven systems using Kafka and apply architectural patterns like Choreography, Strangler, and Sidecar.\nParticipate in code reviews, design discussions, and knowledge-sharing sessions.\nDevelop and deploy applications in GCP (or any public cloud) using services like Cloud Run, GKE, GCS, etc.\nWrite clean, testable, and scalable code with emphasis on readability and maintainability.\nContribute to the adoption of modern Java features, including Pattern Matching, Records, and Record Patterns.\nDemonstrate a foundational understanding of deployment patterns and CI/CD pipelines in cloud environments.\n\nTechnical Requirements\n\nCore Java & Functional Programming\n\nDeep understanding of Java Streams, Functional Interfaces, Lambda expressions, Supplier, Consumer, Function, and reduce operations.\nExperience with newer Java features (preferably Java 17+; familiarity with Java 21 is a plus).\nProficiency in immutable data structures, pure functions, and clean code principles.\n\nMicroservices & Architecture\n\nStrong knowledge of microservices design patterns including:\nChoreography (Kafka-based)\nStrangler Pattern\nSidecar Pattern\nHands-on experience with Kafka or other message brokers in an Event-Driven Architecture (EDA).\n\nCloud & DevOps\n\nHands-on experience deploying applications in GCP or another cloud provider (AWS, Azure).\nFamiliarity with Cloud Run, GKE, GCS, or equivalents in other clouds.\nUnderstanding of deployment automation, infrastructure as code, and CI/CD best practices",
+      "apply_url": "https://www.linkedin.com/jobs/search/?currentJobId=4454107323&f_AL=true&keywords=Backend%20Developer&origin=JOB_SEARCH_PAGE_JOB_FILTER",
+      "source": "linkedin",
+      "status": "TAILORED",
+      "updated_at": "2026-09-11T13:47:00.918Z",
+      "created_at": "2026-09-11T13:46:21.056Z",
+      "tailored_resume_path": "c:\\naukri\\output\\pdf\\IntraEdge_Back_End_Developer_Back_End_Developer_with_verification.pdf"
     }
   },
   "stats": {
