@@ -37,8 +37,10 @@ An open-source, local-first, **100% zero-cost** autonomous agent that automates 
 ├── output/
 │   └── pdf/                   # Generated role-specific PDFs
 ├── .env.example               # Configuration template
+├── interactive.bat            # 1-click interactive script to run agent in visible mode
 ├── login_to_naukri.bat        # 1-click script for one-time Naukri login
-├── watch_agent.bat            # 1-click script to run agent in visible desktop mode
+├── login_to_linkedin.bat      # 1-click script for one-time LinkedIn login
+├── watch_linkedin.bat         # 1-click script for LinkedIn Easy Apply
 ├── run_agent.js               # CLI runner
 └── package.json               # Node.js dependencies
 ```
@@ -71,12 +73,12 @@ Edit `config/settings.json` with your real candidate details, notice period, and
 
 ## 🖥️ Usage
 
-### A. Run in Safe Dry-Run Mode (Visible Desktop Window)
-Scrapes jobs and compiles tailored resumes into `output/pdf/` without submitting:
+### A. Run in Interactive Mode (Visible Desktop Window)
+Prompts you for role, location, and experience, then scrapes jobs and tailors resumes live on your screen:
 ```bash
-node run_agent.js --keywords "Backend Developer" --tech "Spring Boot, Docker, AWS" --yoe 2 --limit 3 --mode dry-run --headed
+node run_agent.js --interactive --headed
 ```
-*(Or simply double-click `watch_agent.bat`)*
+*(Or simply double-click `interactive.bat`)*
 
 ### B. One-Time Login (Enables 1-Click Apply)
 Double-click `login_to_naukri.bat` to log in once to your Naukri account so the agent can apply under your verified credentials.
