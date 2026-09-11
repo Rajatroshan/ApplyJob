@@ -1,0 +1,19 @@
+# Environment variables (contains secret API keys)
+.env
+.env.local
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Browser session profiles
+.chrome_session/
+C:\ChromeProfile/
+
+# Temporary data files
+data/jobs.json.tmp
+
+# Generated PDFs (optional, un-comment to exclude local generated resumes)
+# output/pdf/*.pdf

@@ -1,0 +1,77 @@
+\documentclass[10pt]{article}
+\usepackage[left=0.35in,top=0.2in,right=0.35in,bottom=0.2in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{times}
+\usepackage{setspace}
+
+% ATS friendly: Removes colored boxes around links for clean parsing
+\hypersetup{hidelinks} 
+
+% Optimize section header spacing globally (provides clean gaps without wasting space)
+\titleformat{\section}{\bfseries\uppercase}{\thesection}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{6pt}{6pt} 
+
+% Enforce tight lists globally for space
+\setlist[itemize]{noitemsep, topsep=0pt, leftmargin=12pt, parsep=0pt, partopsep=0pt}
+
+% Compress line spacing slightly to accommodate the larger font on one page
+\renewcommand{\baselinestretch}{0.92} 
+
+\begin{document}
+
+\begin{center}
+    {\Large \textbf{Rajat Kumar Sahu}} \\[0.5em]
+    \href{mailto:rajatroshan2002@gmail.com}{rajatroshan2002@gmail.com} \quad | \quad +91 76088 20376 \quad | \quad Bargarh, Odisha \\[0.2em]
+    \href{https://www.linkedin.com/in/rajat-kumar-sahu-19ab62226/}{linkedin.com/in/rajat-kumar-sahu-19ab62226} \quad | \quad \href{https://linktr.ee/Rajatroshan}{linktr.ee/Rajatroshan}
+\end{center}
+
+\vspace{-1em}
+\section*{Objective}
+{{OBJECTIVE}}
+\vspace{0.5em}
+
+\section*{Education}
+\textbf{B.Tech – Computer Science Engineering}, GIET University, Odisha \hfill \textit{2021 – 2025} \\
+CGPA: 8.3 \\[-0.4em]
+
+\textbf{Intermediate (PCM + IT)}, Vedic Junior College, Sambalpur \hfill \textit{2018 – 2020} \\
+Percentage: 74\%
+\vspace{0.5em}
+
+\section*{Skills}
+\textbf{Programming Languages:} {{SKILLS_LANGUAGES}} \\
+\textbf{Backend \& Frameworks:} {{SKILLS_BACKEND}} \\
+\textbf{Databases:} {{SKILLS_DATABASES}} \\
+\textbf{DevOps \& Cloud:} {{SKILLS_DEVOPS}} \\
+\textbf{API \& Architecture:} {{SKILLS_ARCHITECTURE}} \\
+\textbf{Developer Tools:} Postman, JIRA, Draw.io, GitHub Copilot (AI Agent)
+\vspace{0.5em}
+
+\section*{Experience}
+\textbf{Associate Software Engineer – Tech Mahindra} \hfill \textit{Mar 2026 – present}
+\begin{itemize}
+{{EXP_TECH_MAHINDRA}}
+\end{itemize}
+
+\vspace{0.2em}
+\textbf{Backend Developer – eMediHub Platform, AscendSoft Pte Ltd} \hfill \textit{May 2025 – Mar 2026}
+\begin{itemize}
+{{EXP_EMEDIHUB}}
+\end{itemize}
+\vspace{0.5em}
+
+\section*{Projects}
+\begin{itemize}
+{{PROJECTS_LIST}}
+\end{itemize}
+\vspace{0.5em}
+
+\section*{Certifications}
+\noindent
+\textbf{Claude Code 101} (Tech Mahindra, Apr 2026) \hfill \textbf{JAVA Certification} (WIPRO, Apr 2024) \\[0.4em]
+\textbf{Android Development} (Avyakt 3.0, Oct 2023) \hfill \textbf{MuleSoft Certification} (Aug 2023)
+
+\end{document}

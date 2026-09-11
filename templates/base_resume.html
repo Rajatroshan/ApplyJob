@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rajat Kumar Sahu - Resume</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 8mm 14mm 8mm 14mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Times New Roman", Times, Georgia, serif;
+      color: #000;
+      background: #fff;
+      font-size: 9.6pt;
+      line-height: 1.28;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .name {
+      font-size: 19pt;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 3px;
+    }
+    .contact-info {
+      font-size: 9pt;
+      color: #000;
+      line-height: 1.4;
+    }
+    .contact-info a {
+      color: #000;
+      text-decoration: none;
+    }
+    .section-title {
+      font-size: 9.8pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #000;
+      border-bottom: 1px solid #000;
+      padding-bottom: 1px;
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 9.6pt;
+    }
+    .item-sub {
+      font-size: 9pt;
+      color: #222;
+      margin-bottom: 2px;
+    }
+    .skills-row {
+      margin-bottom: 2px;
+      font-size: 9.4pt;
+    }
+    .skills-row strong {
+      font-weight: bold;
+    }
+    ul {
+      margin-left: 16px;
+      margin-top: 1px;
+      margin-bottom: 4px;
+    }
+    li {
+      margin-bottom: 2px;
+      font-size: 9.3pt;
+      text-align: justify;
+    }
+    .cert-grid {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.2pt;
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="name">Rajat Kumar Sahu</div>
+    <div class="contact-info">
+      <a href="mailto:rajatroshan2002@gmail.com">rajatroshan2002@gmail.com</a> &nbsp;|&nbsp; +91 76088 20376 &nbsp;|&nbsp; Bargarh, Odisha<br>
+      <a href="https://www.linkedin.com/in/rajat-kumar-sahu-19ab62226/">linkedin.com/in/rajat-kumar-sahu-19ab62226</a> &nbsp;|&nbsp;
+      <a href="https://linktr.ee/Rajatroshan">linktr.ee/Rajatroshan</a>
+    </div>
+  </div>
+
+  <div class="section-title">Objective</div>
+  <p style="font-size: 9.3pt; text-align: justify; margin-bottom: 4px;">
+    {{OBJECTIVE}}
+  </p>
+
+  <div class="section-title">Education</div>
+  <div class="item-header">
+    <span>B.Tech – Computer Science Engineering, GIET University, Odisha</span>
+    <span style="font-style: italic; font-weight: normal;">2021 – 2025</span>
+  </div>
+  <div class="item-sub">CGPA: 8.3</div>
+
+  <div class="item-header" style="margin-top: 2px;">
+    <span>Intermediate (PCM + IT), Vedic Junior College, Sambalpur</span>
+    <span style="font-style: italic; font-weight: normal;">2018 – 2020</span>
+  </div>
+  <div class="item-sub">Percentage: 74%</div>
+
+  <div class="section-title">Skills</div>
+  <div class="skills-row"><strong>Programming Languages:</strong> {{SKILLS_LANGUAGES}}</div>
+  <div class="skills-row"><strong>Backend &amp; Frameworks:</strong> {{SKILLS_BACKEND}}</div>
+  <div class="skills-row"><strong>Databases:</strong> {{SKILLS_DATABASES}}</div>
+  <div class="skills-row"><strong>DevOps &amp; Cloud:</strong> {{SKILLS_DEVOPS}}</div>
+  <div class="skills-row"><strong>API &amp; Architecture:</strong> {{SKILLS_ARCHITECTURE}}</div>
+  <div class="skills-row"><strong>Developer Tools:</strong> Postman, JIRA, Draw.io, GitHub Copilot (AI Agent)</div>
+
+  <div class="section-title">Experience</div>
+  <div class="item-header">
+    <span>Associate Software Engineer – Tech Mahindra</span>
+    <span style="font-style: italic; font-weight: normal;">Mar 2026 – present</span>
+  </div>
+  <ul>
+    {{EXP_TECH_MAHINDRA}}
+  </ul>
+
+  <div class="item-header" style="margin-top: 3px;">
+    <span>Backend Developer – eMediHub Platform, AscendSoft Pte Ltd</span>
+    <span style="font-style: italic; font-weight: normal;">May 2025 – Mar 2026</span>
+  </div>
+  <ul>
+    {{EXP_EMEDIHUB}}
+  </ul>
+
+  <div class="section-title">Projects</div>
+  <ul>
+    {{PROJECTS_LIST}}
+  </ul>
+
+  <div class="section-title">Certifications</div>
+  <div class="cert-grid">
+    <span><strong>Claude Code 101</strong> (Tech Mahindra, Apr 2026)</span>
+    <span><strong>JAVA Certification</strong> (WIPRO, Apr 2024)</span>
+  </div>
+  <div class="cert-grid">
+    <span><strong>Android Development</strong> (Avyakt 3.0, Oct 2023)</span>
+    <span><strong>MuleSoft Certification</strong> (Aug 2023)</span>
+  </div>
+
+</body>
+</html>

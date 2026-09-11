@@ -1,0 +1,64 @@
+{
+  "user_profile": {
+    "full_name": "Rajat Kumar Sahu",
+    "email": "rajatroshan2002@gmail.com",
+    "phone": "+91 76088 20376",
+    "location": "Bargarh, Odisha",
+    "linkedin": "https://www.linkedin.com/in/rajat-kumar-sahu-19ab62226/",
+    "portfolio": "https://linktr.ee/Rajatroshan",
+    "years_of_experience": 2.5,
+    "current_company": "Tech Mahindra",
+    "current_role": "Associate Software Engineer",
+    "target_roles": [
+      "Backend Developer",
+      "Software Engineer",
+      "Java Developer",
+      "DevOps Engineer"
+    ],
+    "core_skills": [
+      "Java",
+      "Spring Boot",
+      "Microservices",
+      "Spring Security",
+      "Hibernate/JPA",
+      "Node.js",
+      "Docker",
+      "Docker Compose",
+      "CI/CD",
+      "AWS (EC2, RDS, S3)",
+      "Linux",
+      "Nginx",
+      "MySQL",
+      "PostgreSQL",
+      "MongoDB",
+      "REST APIs"
+    ]
+  },
+  "job_filters": {
+    "keywords": "Backend Developer",
+    "experience_min": 1,
+    "experience_max": 4,
+    "preferred_locations": [
+      "Bangalore",
+      "Hyderabad",
+      "Pune",
+      "Noida",
+      "Remote"
+    ],
+    "exclude_service_companies": false
+  },
+  "screening_answers": {
+    "notice_period_days": 30,
+    "current_ctc_lpa": 6,
+    "expected_ctc_lpa": 12,
+    "ready_to_relocate": "Yes",
+    "work_authorization": "Yes"
+  },
+  "browser_config": {
+    "cdp_url": "http://localhost:9222",
+    "chrome_path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "user_data_dir": "C:\\ChromeProfile",
+    "headless": false,
+    "action_delay_ms": 1500
+  }
+}

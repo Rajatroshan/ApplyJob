@@ -1,0 +1,110 @@
+{
+  "jobs": {
+    "test_101": {
+      "job_id": "test_101",
+      "title": "Senior Backend Engineer",
+      "company": "FinTech Innovations",
+      "status": "DISCOVERED",
+      "updated_at": "2026-09-11T07:45:17.733Z",
+      "created_at": "2026-09-11T06:45:37.412Z"
+    },
+    "210826935348": {
+      "job_id": "210826935348",
+      "title": "Backend Developer",
+      "company": "Forward Eye Technologies",
+      "experience_req": "0-2 Yrs",
+      "location": "Pune",
+      "skills": [
+        "java",
+        "json",
+        "rest",
+        "javascript",
+        "spring boot",
+        "css",
+        "screening",
+        "hibernate"
+      ],
+      "jd_text": "RESTful JSON-based APIs Java based API with Springboot. Using Postgres as a database. O...",
+      "apply_url": "https://www.naukri.com/job-listings-backend-developer-forward-eye-technologies-pune-0-to-2-years-210826935348",
+      "source": "naukri",
+      "status": "TAILORED",
+      "updated_at": "2026-09-11T10:21:07.659Z",
+      "created_at": "2026-09-11T08:04:11.273Z",
+      "tailored_resume_path": "c:\\naukri\\output\\pdf\\Forward_Eye_Technologies_Backend_Developer.pdf"
+    },
+    "100826004347": {
+      "job_id": "100826004347",
+      "title": "Backend Developer",
+      "company": "ANH Engineering Services (ANHESPL)",
+      "experience_req": "0-4 Yrs",
+      "location": "Noida, Gurugram, Bengaluru",
+      "skills": [
+        "Golang",
+        "Python",
+        "AWS",
+        "Backend",
+        "Backend Development",
+        "Development"
+      ],
+      "jd_text": "Required Experience . 1+ years of experience in Python and Golang developmentGood under...",
+      "apply_url": "https://www.naukri.com/job-listings-backend-developer-anh-engineering-services-anhespl-noida-gurugram-bengaluru-0-to-4-years-100826004347",
+      "source": "naukri",
+      "status": "TAILORED",
+      "updated_at": "2026-09-11T08:04:32.787Z",
+      "created_at": "2026-09-11T08:04:23.131Z",
+      "tailored_resume_path": "C:\\naukri\\output\\pdf\\ANH_Engineering_Services__ANHESPL__Backend_Developer.pdf"
+    },
+    "210826930271": {
+      "job_id": "210826930271",
+      "title": "Backend Developer",
+      "company": "Forward Eye Technologies",
+      "experience_req": "0-2 Yrs",
+      "location": "Noida",
+      "skills": [
+        "java",
+        "json",
+        "rest",
+        "javascript",
+        "spring boot",
+        "css",
+        "screening",
+        "hibernate"
+      ],
+      "jd_text": "RESTful JSON-based APIs Java based API with Springboot. Using Postgres as a database. O...",
+      "apply_url": "https://www.naukri.com/job-listings-backend-developer-forward-eye-technologies-noida-0-to-2-years-210826930271",
+      "source": "naukri",
+      "status": "TAILORED",
+      "updated_at": "2026-09-11T10:15:02.794Z",
+      "created_at": "2026-09-11T10:12:42.366Z",
+      "tailored_resume_path": "c:\\naukri\\output\\pdf\\Forward_Eye_Technologies_Backend_Developer.pdf"
+    },
+    "110926011675": {
+      "job_id": "110926011675",
+      "title": "Backend Developer",
+      "company": "Damacloid Technologies",
+      "experience_req": "2-4 Yrs",
+      "location": "Mumbai(Lower Parel)",
+      "skills": [
+        "GCP",
+        "MySQL",
+        "Node.js",
+        "MongoDB",
+        "AWS",
+        "English",
+        "Express",
+        "CICD"
+      ],
+      "jd_text": "2-3 years of relevant experienceLocation - Lower Parel Strong backend development & AP...",
+      "apply_url": "https://www.naukri.com/job-listings-backend-developer-damacloid-technologies-mumbai-2-to-4-years-110926011675",
+      "source": "naukri",
+      "status": "TAILORED",
+      "updated_at": "2026-09-11T10:21:25.084Z",
+      "created_at": "2026-09-11T10:21:07.663Z",
+      "tailored_resume_path": "c:\\naukri\\output\\pdf\\Damacloid_Technologies_Backend_Developer.pdf"
+    }
+  },
+  "stats": {
+    "total_applied": 0,
+    "total_skipped": 0
+  }
+}
