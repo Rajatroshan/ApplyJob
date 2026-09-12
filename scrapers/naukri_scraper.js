@@ -75,96 +75,119 @@ class NaukriScraper {
     const jobs = [];
 
     try {
-      await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
-      await page.waitForTimeout(3000);
+      let pageNo = 1;
+      const maxPages = 5;
 
-      // Scroll to trigger lazy loading of job cards
-      await page.evaluate(() => window.scrollBy(0, 800));
-      await page.waitForTimeout(1500);
+      while (jobs.length < limit && pageNo <= maxPages) {
+      let pageUrl = searchUrl;
+      if (pageNo > 1) {
+        pageUrl = searchUrl.includes('?') ? `${searchUrl}&pageNo=${pageNo}` : `${searchUrl}?pageNo=${pageNo}`;
+      }
+      console.log(`[Scraper] Scraping page ${pageNo}: ${pageUrl}`);
 
-      // Extract job cards
-      const jobElements = await page.$$('.srp-jobtuple-wrapper, .jobTuple, article.jobTuple');
-      console.log(`[Scraper] Found ${jobElements.length} job cards on the first page.`);
+      try {
+        await page.goto(pageUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await page.waitForTimeout(3000);
 
-      for (let i = 0; i < jobElements.length && jobs.length < limit; i++) {
-        const el = jobElements[i];
+        // Scroll to trigger lazy loading of job cards
+        await page.evaluate(() => window.scrollBy(0, 800));
+        await page.waitForTimeout(1500);
 
-        try {
-          await el.scrollIntoViewIfNeeded().catch(() => {});
-          if (!this.headless) {
-            await el.evaluate(node => {
-              node.style.outline = '3px solid #f59e0b';
-              node.style.transition = 'all 0.3s ease';
-            }).catch(() => {});
-            await page.waitForTimeout(300);
-          }
+        // Extract job cards
+        const jobElements = await page.$$('.srp-jobtuple-wrapper, .jobTuple, article.jobTuple');
+        console.log(`[Scraper] Found ${jobElements.length} job cards on page ${pageNo}.`);
 
-          const title = await el.$eval('.title, a.title', e => e.innerText.trim()).catch(() => '');
-          const company = await el.$eval('.comp-name, a.subTitle', e => e.innerText.trim()).catch(() => 'Company');
-          const expText = await el.$eval('.expwdth, .experience', e => e.innerText.trim()).catch(() => '');
-          const location = await el.$eval('.locWdth, .location', e => e.innerText.trim()).catch(() => 'India');
-          const jdSnippet = await el.$eval('.job-desc, .job-description', e => e.innerText.trim()).catch(() => '');
-          const jobUrl = await el.$eval('.title, a.title', e => e.href).catch(() => '');
+        if (jobElements.length === 0) {
+          console.log(`[Scraper] No more cards found. Stopping pagination.`);
+          break;
+        }
 
-          // Extract tags/skills
-          const tags = await el.$$eval('.tags-gt li, .dot-gt li, .tag-li', elements => 
-            elements.map(e => e.innerText.trim())
-          ).catch(() => []);
+        for (let i = 0; i < jobElements.length && jobs.length < limit; i++) {
+          const el = jobElements[i];
 
-          const allText = `${title} ${jdSnippet} ${tags.join(' ')}`.toLowerCase();
-
-          // Apply Tech Stack Constraint Filter
-          const matchesTech = targetTech.some(tech => allText.includes(tech));
-          if (!matchesTech) {
+          try {
+            await el.scrollIntoViewIfNeeded().catch(() => {});
             if (!this.headless) {
               await el.evaluate(node => {
-                node.style.outline = '1px solid #cbd5e1';
-                node.style.opacity = '0.5';
+                node.style.outline = '3px solid #f59e0b';
+                node.style.transition = 'all 0.3s ease';
+              }).catch(() => {});
+              await page.waitForTimeout(300);
+            }
+
+            const title = await el.$eval('.title, a.title', e => e.innerText.trim()).catch(() => '');
+            const company = await el.$eval('.comp-name, a.subTitle', e => e.innerText.trim()).catch(() => 'Company');
+            const expText = await el.$eval('.expwdth, .experience', e => e.innerText.trim()).catch(() => '');
+            const location = await el.$eval('.locWdth, .location', e => e.innerText.trim()).catch(() => 'India');
+            const jdSnippet = await el.$eval('.job-desc, .job-description', e => e.innerText.trim()).catch(() => '');
+            const jobUrl = await el.$eval('.title, a.title', e => e.href).catch(() => '');
+
+            // Extract tags/skills
+            const tags = await el.$$eval('.tags-gt li, .dot-gt li, .tag-li', elements => 
+              elements.map(e => e.innerText.trim())
+            ).catch(() => []);
+
+            const allText = `${title} ${jdSnippet} ${tags.join(' ')}`.toLowerCase();
+
+            // Apply Tech Stack Constraint Filter
+            const matchesTech = targetTech.some(tech => allText.includes(tech));
+            if (!matchesTech) {
+              if (!this.headless) {
+                await el.evaluate(node => {
+                  node.style.outline = '1px solid #cbd5e1';
+                  node.style.opacity = '0.5';
+                }).catch(() => {});
+              }
+              console.log(`[Scraper] Skipping "${title}" at ${company} - Does not match tech constraints.`);
+              continue;
+            }
+
+            if (!this.headless) {
+              await el.evaluate(node => {
+                node.style.outline = '4px solid #10b981';
+                node.style.backgroundColor = '#ecfdf5';
               }).catch(() => {});
             }
-            console.log(`[Scraper] Skipping "${title}" at ${company} - Does not match tech constraints.`);
-            continue;
+
+            const jobId = jobUrl ? jobUrl.split('-').pop() : `naukri_${Date.now()}_${i}`;
+
+            // Avoid adding duplicate postings from the same company in the same batch
+            const isDuplicate = jobs.some(
+              j => j.job_id === jobId || 
+              (j.company.toLowerCase() === company.toLowerCase() && j.title.toLowerCase() === title.toLowerCase())
+            );
+
+            if (isDuplicate) {
+              console.log(`[Scraper] Skipping duplicate posting from "${company}".`);
+              continue;
+            }
+
+            jobs.push({
+              job_id: jobId,
+              title,
+              company,
+              experience_req: expText,
+              location,
+              skills: tags,
+              jd_text: jdSnippet || `${title} at ${company}. Required skills: ${tags.join(', ')}`,
+              apply_url: jobUrl,
+              source: 'naukri'
+            });
+
+            console.log(`[Scraper] ✓ Matched Job [${jobs.length}/${limit}]: ${title} at ${company} (${expText})`);
+          } catch (cardErr) {
+            // Ignore individual parsing failure
           }
-
-          if (!this.headless) {
-            await el.evaluate(node => {
-              node.style.outline = '4px solid #10b981';
-              node.style.backgroundColor = '#ecfdf5';
-            }).catch(() => {});
-          }
-
-          const jobId = jobUrl ? jobUrl.split('-').pop() : `naukri_${Date.now()}_${i}`;
-
-          // Avoid adding duplicate postings from the same company in the same batch
-          const isDuplicate = jobs.some(
-            j => j.job_id === jobId || 
-            (j.company.toLowerCase() === company.toLowerCase() && j.title.toLowerCase() === title.toLowerCase())
-          );
-
-          if (isDuplicate) {
-            console.log(`[Scraper] Skipping duplicate posting from "${company}".`);
-            continue;
-          }
-
-          jobs.push({
-            job_id: jobId,
-            title,
-            company,
-            experience_req: expText,
-            location,
-            skills: tags,
-            jd_text: jdSnippet || `${title} at ${company}. Required skills: ${tags.join(', ')}`,
-            apply_url: jobUrl,
-            source: 'naukri'
-          });
-
-          console.log(`[Scraper] ✓ Matched Job [${jobs.length}/${limit}]: ${title} at ${company} (${expText})`);
-        } catch (cardErr) {
-          // Ignore individual parsing failure
         }
+      } catch (pageErr) {
+        console.warn(`[Scraper] Error scraping page ${pageNo}: ${pageErr.message}`);
+        break;
       }
 
-      return jobs;
+      pageNo++;
+    }
+
+    return jobs;
     } catch (err) {
       console.error(`[Scraper] Error during scraping: ${err.message}`);
       return jobs;

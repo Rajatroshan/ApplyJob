@@ -15,6 +15,7 @@ C:\ChromeProfile/
 # Temporary data files
 data/jobs.json.tmp
 
-# Generated PDFs (optional, un-comment to exclude local generated resumes)
-# output/pdf/*.pdf
+# Generated PDFs
+output/pdf/*.pdf
+output/html/*.html
 

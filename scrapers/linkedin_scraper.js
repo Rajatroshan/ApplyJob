@@ -56,11 +56,12 @@ class LinkedinScraper {
    */
   async searchJobs(options = {}) {
     const keywords = encodeURIComponent(options.keywords || 'Backend Developer');
+    const location = encodeURIComponent(options.location || 'India');
     const targetTech = (options.tech_stack || ['Java', 'Spring Boot']).map(t => t.toLowerCase().trim());
-    const limit = options.limit || 3;
+    const limit = options.limit || 10;
 
     // f_AL=true filters for Easy Apply jobs specifically
-    const searchUrl = `https://www.linkedin.com/jobs/search/?keywords=${keywords}&f_AL=true&origin=JOB_SEARCH_PAGE_JOB_FILTER`;
+    const searchUrl = `https://www.linkedin.com/jobs/search/?keywords=${keywords}&location=${location}&f_AL=true&origin=JOB_SEARCH_PAGE_JOB_FILTER`;
     console.log(`[LinkedIn Scraper] Navigating to: ${searchUrl}`);
 
     const { browser, context, isCdp } = await this.getBrowserContext();
@@ -82,96 +83,132 @@ class LinkedinScraper {
       const cardSelector = '.jobs-search-results__list-item, div.job-card-container, li.scaffold-layout__list-item';
       await page.waitForSelector(cardSelector, { timeout: 10000 }).catch(() => {});
 
-      const jobCards = await page.$$(cardSelector);
-      console.log(`[LinkedIn Scraper] Found ${jobCards.length} job cards on the first page.`);
+      let scrollAttempts = 0;
+      while (jobs.length < limit && scrollAttempts < 8) {
+        scrollAttempts++;
+        const jobCards = await page.$$(cardSelector);
+        console.log(`[LinkedIn Scraper] Found ${jobCards.length} job cards on current view (pass ${scrollAttempts}).`);
 
-      for (let i = 0; i < jobCards.length && jobs.length < limit; i++) {
-        const card = jobCards[i];
+        if (jobCards.length === 0) break;
 
-        try {
-          await card.scrollIntoViewIfNeeded().catch(() => {});
+        for (let i = 0; i < jobCards.length && jobs.length < limit; i++) {
+          const card = jobCards[i];
 
-          if (!this.headless) {
-            await card.evaluate(node => {
-              node.style.outline = '3px solid #f59e0b';
-              node.style.transition = 'all 0.3s ease';
-            }).catch(() => {});
-            await page.waitForTimeout(400);
-          }
+          try {
+            await card.scrollIntoViewIfNeeded().catch(() => {});
 
-          // Extract preview details
-          const title = await card.$eval(
-            '.job-card-list__title, .artdeco-entity-lockup__title a, strong',
-            e => e.innerText.trim()
-          ).catch(() => '');
-
-          const company = await card.$eval(
-            '.job-card-container__primary-description, .artdeco-entity-lockup__subtitle',
-            e => e.innerText.trim()
-          ).catch(() => 'Company');
-
-          const location = await card.$eval(
-            '.job-card-container__metadata-item, .artdeco-entity-lockup__caption',
-            e => e.innerText.trim()
-          ).catch(() => 'India');
-
-          // Click card to load full JD in the right preview pane
-          await card.click().catch(() => {});
-          await page.waitForTimeout(1200);
-
-          // Extract full JD text from the right panel
-          const jdText = await page.$eval(
-            '#job-details, .jobs-description__content, .jobs-box__html-content',
-            e => e.innerText.trim()
-          ).catch(() => '');
-
-          const allText = `${title} ${company} ${jdText}`.toLowerCase();
-
-          // Apply Tech Stack Constraint Filter
-          const matchesTech = targetTech.some(tech => allText.includes(tech));
-          if (!matchesTech) {
             if (!this.headless) {
               await card.evaluate(node => {
-                node.style.outline = '1px solid #cbd5e1';
-                node.style.opacity = '0.5';
+                node.style.outline = '3px solid #f59e0b';
+                node.style.transition = 'all 0.3s ease';
+              }).catch(() => {});
+              await page.waitForTimeout(300);
+            }
+
+            // Extract preview details
+            const title = await card.$eval(
+              '.job-card-list__title, .artdeco-entity-lockup__title a, strong',
+              e => e.innerText.trim()
+            ).catch(() => '');
+
+            const company = await card.$eval(
+              '.job-card-container__primary-description, .artdeco-entity-lockup__subtitle',
+              e => e.innerText.trim()
+            ).catch(() => 'Company');
+
+            const cardLocation = await card.$eval(
+              '.job-card-container__metadata-item, .artdeco-entity-lockup__caption',
+              e => e.innerText.trim()
+            ).catch(() => 'India');
+
+            // Extract canonical job view URL
+            let jobUrl = await card.$eval('a[href*="/jobs/view/"]', a => a.href).catch(() => '');
+            let jobId = '';
+            let rawJobId = '';
+            if (jobUrl) {
+              const m = jobUrl.match(/\/jobs\/view\/(\d+)/);
+              if (m) {
+                rawJobId = m[1];
+                jobId = `li_${rawJobId}`;
+                jobUrl = `https://www.linkedin.com/jobs/search/?currentJobId=${rawJobId}&f_AL=true`;
+              }
+            }
+
+            // Check duplicate
+            if (jobs.some(j => (jobId && j.job_id === jobId) || (j.company.toLowerCase() === company.toLowerCase() && j.title.toLowerCase() === title.toLowerCase()))) {
+              continue;
+            }
+
+            // Click card to load full JD in the right preview pane
+            await card.click().catch(() => {});
+            await page.waitForTimeout(1200);
+
+            if (!jobId) {
+              const currentJobId = await page.evaluate(() => {
+                const m = window.location.href.match(/currentJobId=(\d+)/);
+                return m ? m[1] : null;
+              });
+              if (currentJobId) {
+                jobId = `li_${currentJobId}`;
+                jobUrl = `https://www.linkedin.com/jobs/search/?currentJobId=${currentJobId}&f_AL=true`;
+              } else {
+                jobId = `li_${Date.now()}_${i}`;
+                jobUrl = page.url();
+              }
+            }
+
+            // Extract full JD text from the right panel
+            const jdText = await page.$eval(
+              '#job-details, .jobs-description__content, .jobs-box__html-content',
+              e => e.innerText.trim()
+            ).catch(() => '');
+
+            const allText = `${title} ${company} ${jdText}`.toLowerCase();
+
+            // Apply Tech Stack Constraint Filter
+            const matchesTech = targetTech.some(tech => allText.includes(tech));
+            if (!matchesTech) {
+              if (!this.headless) {
+                await card.evaluate(node => {
+                  node.style.outline = '1px solid #cbd5e1';
+                  node.style.opacity = '0.5';
+                }).catch(() => {});
+              }
+              console.log(`[LinkedIn Scraper] Skipping "${title}" at ${company} - Does not match tech constraints.`);
+              continue;
+            }
+
+            if (!this.headless) {
+              await card.evaluate(node => {
+                node.style.outline = '4px solid #10b981';
+                node.style.backgroundColor = '#ecfdf5';
               }).catch(() => {});
             }
-            console.log(`[LinkedIn Scraper] Skipping "${title}" at ${company} - Does not match tech constraints.`);
-            continue;
+
+            jobs.push({
+              job_id: jobId,
+              title,
+              company,
+              location: cardLocation,
+              experience_req: options.yoe ? `${options.yoe}+ Years` : 'Mid-Level',
+              skills: targetTech,
+              jd_text: jdText.slice(0, 3000) || `${title} at ${company}. Requirements: ${targetTech.join(', ')}`,
+              apply_url: jobUrl,
+              source: 'linkedin'
+            });
+
+            console.log(`[LinkedIn Scraper] ✓ Matched Job [${jobs.length}/${limit}]: ${title} at ${company}`);
+          } catch (cardErr) {
+            // Continue to next card
           }
-
-          if (!this.headless) {
-            await card.evaluate(node => {
-              node.style.outline = '4px solid #10b981';
-              node.style.backgroundColor = '#ecfdf5';
-            }).catch(() => {});
-          }
-
-          const jobId = `li_${title.replace(/\s+/g, '_')}_${company.replace(/\s+/g, '_')}_${i}`;
-
-          // Avoid duplicates
-          const isDuplicate = jobs.some(j => j.company.toLowerCase() === company.toLowerCase() && j.title.toLowerCase() === title.toLowerCase());
-          if (isDuplicate) {
-            console.log(`[LinkedIn Scraper] Skipping duplicate posting from "${company}".`);
-            continue;
-          }
-
-          jobs.push({
-            job_id: jobId,
-            title,
-            company,
-            location,
-            experience_req: options.yoe_min ? `${options.yoe_min}+ Years` : 'Mid-Level',
-            skills: targetTech,
-            jd_text: jdText.slice(0, 3000) || `${title} at ${company}. Requirements: ${targetTech.join(', ')}`,
-            apply_url: page.url(),
-            source: 'linkedin'
-          });
-
-          console.log(`[LinkedIn Scraper] ✓ Matched Job [${jobs.length}/${limit}]: ${title} at ${company}`);
-        } catch (cardErr) {
-          // Continue to next card
         }
+
+        // Scroll the list down to trigger lazy loading of more job cards
+        await page.evaluate(() => {
+          const list = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-detail-inner');
+          if (list) list.scrollTop += 800;
+        });
+        await page.waitForTimeout(1500);
       }
 
       return jobs;

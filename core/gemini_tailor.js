@@ -37,6 +37,10 @@ class GeminiTailor {
           console.log(`[Gemini Tailor] Calling Gemini 3.6 Flash for ${job.company} - ${job.title} (attempt ${attempts})...`);
           tailoredData = await this._callGemini(baseProfile, job);
         } catch (err) {
+          if (err.message && (err.message.includes('429') || err.message.includes('RESOURCE_EXHAUSTED'))) {
+            console.warn(`[Gemini Tailor] Gemini free tier quota reached. Using instant smart keyword fallback.`);
+            break;
+          }
           console.warn(`[Gemini Tailor] Gemini attempt ${attempts} failed (${err.message}).`);
           if (attempts < 3) {
             await new Promise(r => setTimeout(r, 2000));

@@ -36,8 +36,8 @@ program
   .option('--current-ctc <number>', 'Current CTC in INR', settings.screening_answers?.current_ctc_raw || 450000)
   .option('--expected-ctc <number>', 'Expected CTC in INR', settings.screening_answers?.expected_ctc_raw || 900000)
   .option('--notice <days>', 'Notice period in days', settings.screening_answers?.notice_period_days || 60)
-  .option('-l, --limit <number>', 'Maximum matching jobs to process', 3)
-  .option('-m, --mode <mode>', 'Execution mode: dry-run (generate PDFs only) or auto-apply (submit live)', 'dry-run')
+  .option('-l, --limit <number>', 'Maximum matching jobs to process', 10)
+  .option('-m, --mode <mode>', 'Execution mode: auto-apply (submit live) or dry-run (generate PDFs only)', 'auto-apply')
   .option('--headed', 'Launch a visible browser window on your desktop screen to watch it live', false)
   .option('--slow <ms>', 'Milliseconds delay between actions so you can watch comfortably', 600)
   .parse(process.argv);
@@ -83,6 +83,13 @@ async function main() {
 
   if (options.interactive) {
     console.log('📋 Runtime Search & Application Constraints (Press [Enter] to keep default):');
+    const platAns = await askQuestion(`0. Target Platform [1: Naukri.com, 2: LinkedIn Easy Apply] (Default: ${options.platform === 'linkedin' ? '2' : '1'}): `);
+    if (platAns === '2' || (platAns && platAns.toLowerCase().includes('linked'))) {
+      options.platform = 'linkedin';
+    } else if (platAns === '1' || (platAns && platAns.toLowerCase().includes('naukri'))) {
+      options.platform = 'naukri';
+    }
+
     const roleAns = await askQuestion(`1. Target Job Role [${options.keywords}]: `);
     if (roleAns) options.keywords = roleAns;
 
@@ -100,6 +107,16 @@ async function main() {
 
     const noticeAns = await askQuestion(`6. Notice Period in Days [${options.notice}]: `);
     if (noticeAns) options.notice = Number(noticeAns);
+
+    const limitAns = await askQuestion(`7. Max Jobs to Search & Apply [${options.limit}]: `);
+    if (limitAns) options.limit = Number(limitAns);
+
+    const modeAns = await askQuestion(`8. Execution Mode [1: auto-apply (submit live), 2: dry-run (generate PDFs only)] (Default: 1): `);
+    if (modeAns === '2' || (modeAns && modeAns.toLowerCase().includes('dry'))) {
+      options.mode = 'dry-run';
+    } else {
+      options.mode = 'auto-apply';
+    }
     console.log('');
   }
 
@@ -183,6 +200,7 @@ async function main() {
 
   // Step 2: Tailor Resumes & Compile PDFs
   const processedJobs = [];
+  const externalSites = [];
 
   for (let i = 0; i < matchingJobs.length; i++) {
     const job = matchingJobs[i];
@@ -196,38 +214,43 @@ async function main() {
 
     db.saveJob({ ...job, status: 'DISCOVERED' });
 
-    // Step 2a: Gemini Resume Tailoring
-    console.log(`[Agent] Stage 2: Tailoring resume bullet points for ATS match...`);
-    const tailoredHtml = await geminiTailor.tailorResume(userProfile, job);
+    // Define On-Demand Resume Generator (called only if portal requests an explicit custom file upload)
+    const resumeProvider = async () => {
+      console.log(`[Agent] Resume upload requested for ${job.company}. Generating tailored single-page PDF on-demand...`);
+      const tailoredHtml = await geminiTailor.tailorResume(userProfile, job);
+      const pdfFilename = `${job.company}_${job.title}_${job.job_id}`;
+      return await pdfCompiler.compileHtmlToPdf(tailoredHtml, pdfFilename);
+    };
 
-    // Step 2b: Local Single-Page PDF Compilation
-    console.log(`[Agent] Stage 3: Compiling single-page PDF...`);
-    const pdfFilename = `${job.company}_${job.title}`;
-    const pdfPath = await pdfCompiler.compileHtmlToPdf(tailoredHtml, pdfFilename);
-
-    db.saveJob({ ...job, status: 'TAILORED', tailored_resume_path: pdfPath });
-
-    // Step 2c: Application Submission
+    // Step 2: Application Submission
     if (options.mode === 'auto-apply') {
-      console.log(`[Agent] Stage 4: Submitting application on portal...`);
+      console.log(`[Agent] Stage 2: Processing application on portal...`);
       const { browser, context, isCdp } = await scraper.getBrowserContext();
       const autoApplier = isLinkedIn
-        ? new LinkedinAutoApply(context, settings)
-        : new AutoApply(context, settings);
-      const result = await autoApplier.apply(job, pdfPath);
+        ? new LinkedinAutoApply(context, { ...settings, user_profile: userProfile })
+        : new AutoApply(context, { ...settings, user_profile: userProfile });
+
+      const result = await autoApplier.apply(job, resumeProvider);
 
       if (result.success) {
-        db.markApplied(job.job_id, pdfPath);
-        processedJobs.push({ ...job, status: 'APPLIED', pdf: pdfPath });
+        db.markApplied(job.job_id, result.message);
+        processedJobs.push({ ...job, status: 'APPLIED', note: result.message });
+      } else if (result.type === 'EXTERNAL_SITE') {
+        const directLink = result.link || job.apply_url;
+        externalSites.push({ company: job.company, title: job.title, link: directLink });
+        db.saveJob({ ...job, status: 'EXTERNAL_SITE', reason: `Company portal: ${directLink}` });
+        processedJobs.push({ ...job, status: 'SKIPPED_EXTERNAL', note: `Company portal link saved` });
       } else {
         db.saveJob({ ...job, status: 'FLAGGED_FOR_MANUAL', reason: result.message });
-        processedJobs.push({ ...job, status: 'MANUAL_REQUIRED', pdf: pdfPath, reason: result.message });
+        processedJobs.push({ ...job, status: 'MANUAL_REQUIRED', note: result.message });
       }
 
       if (isCdp && browser) browser.disconnect();
       else if (context) await context.close();
     } else {
-      console.log(`[Agent] [DRY RUN] Generated tailored single-page PDF at: ${pdfPath}`);
+      // In dry-run mode only: generate sample PDF for user inspection
+      console.log(`[Agent] [DRY RUN] Compiling sample tailored PDF for inspection...`);
+      const pdfPath = await resumeProvider();
       processedJobs.push({ ...job, status: 'READY_TO_APPLY', pdf: pdfPath });
     }
   }
@@ -238,9 +261,21 @@ async function main() {
   console.log('======================================================');
   processedJobs.forEach((j, idx) => {
     console.log(`[${idx + 1}] ${j.company.padEnd(20)} | ${j.title.padEnd(25)} | Status: ${j.status}`);
-    console.log(`    📄 Resume: ${j.pdf}`);
-    if (j.reason) console.log(`    ℹ Note:   ${j.reason}`);
+    if (j.pdf) console.log(`    📄 Resume: ${j.pdf}`);
+    if (j.note) console.log(`    ℹ Info:   ${j.note}`);
+    if (j.reason) console.log(`    ⚠️ Reason: ${j.reason}`);
   });
+
+  if (externalSites.length > 0) {
+    console.log('\n======================================================');
+    console.log('🌐 EXTERNAL COMPANY SITES (Skipped for Manual Direct Review)');
+    console.log('👉 Click or open these links directly to apply:');
+    console.log('======================================================');
+    externalSites.forEach((site, idx) => {
+      console.log(`[${idx + 1}] ${site.company} - ${site.title}`);
+      console.log(`    🔗 Direct Link: ${site.link}`);
+    });
+  }
   console.log('======================================================\n');
 }
 
